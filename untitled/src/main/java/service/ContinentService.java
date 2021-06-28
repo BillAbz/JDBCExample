@@ -57,7 +57,7 @@ public class ContinentService {
             continent.setName(name);
         }
 
-        continentDAO.updateContinent (continent, continent.getId ());
+        continentDAO.updateContinent (continent);
         System.out.println ("Continent up");
 
     }
@@ -65,16 +65,16 @@ public class ContinentService {
     public void deleteContinent() throws SQLException {
         Scanner scanner = new Scanner (System.in);
         continentDAO.getAllContinents ().forEach (System.out::println);
-        System.out.println("Give id of country you want to delete:");
+        System.out.println("Give id of Continent you want to delete:");
         int continentId = giveExistingContinentId ();
-        System.out.println("Are you sure you want to delete this country:");
+        System.out.println("Are you sure you want to delete this Continent:");
         System.out.println (continentDAO.getContinentById (continentId));
         System.out.println ("Y/N");
         String answer = scanner.next ();
         if (answer.toUpperCase(Locale.ROOT).equals("Y")){
             continentDAO.deleteContinent (continentDAO.getContinentById (continentId));
-            System.out.println("country has been deleted");
-        }else System.out.println("Country has not been deleted");
+            System.out.println("Continent has been deleted");
+        }else System.out.println("Continent has not been deleted");
     }
 
     private int giveExistingContinentId() throws SQLException {

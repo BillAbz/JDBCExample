@@ -1,5 +1,6 @@
 import dataBaseConnectors.CountryDAO;
 import model.Country;
+import service.CityService;
 import service.ContinentService;
 import service.CountryService;
 
@@ -35,10 +36,10 @@ public class MainDBClass {
             Scanner scanner = new Scanner(System.in);
 
             while (choiceOne==9) {
-                System.out.println("What do you want to look at? \n1: Countries \n2: Continents\n0: End");
+                System.out.println("What do you want to look at? \n1: Countries \n2: Continents\n3: City\n0: End");
                 choiceOne = scanner.nextInt();
                 if(choiceOne==0)break;
-                if(choiceOne<1||choiceOne>2){
+                if(choiceOne<1||choiceOne>3){
                     choiceOne = 9;
                     System.out.println("Invalid choice.");
                 }else {
@@ -61,6 +62,7 @@ public class MainDBClass {
             Scanner scanner = new Scanner(System.in);
             CountryService countryService = new CountryService();
             ContinentService continentService = new ContinentService ();
+            CityService cityService = new CityService ();
             if (choiceTwo!=0)
                 if (choiceOne==1){
 
@@ -74,15 +76,45 @@ public class MainDBClass {
                     System.out.println("We did a country thing!");
 
 
-                } else if (choiceOne==2){
-                    switch (choiceTwo){
-                        case 1:continentService.showAllContinents ();break;//TODO see All Continents
-                        case 2:continentService.showContinentById ();break;//TODO see One Continent By Id
-                        case 3:continentService.addContinent ();break;//TODO add One new Continent
-                        case 4:continentService.updateContinent ();break;//TODO edit One Continent
-                        case 5:continentService.deleteContinent ();break;//TODO delete One Continent
+                } else if (choiceOne==2) {
+                    switch (choiceTwo) {
+                        case 1:
+                            continentService.showAllContinents ();
+                            break;//TODO see All Continents
+                        case 2:
+                            continentService.showContinentById ();
+                            break;//TODO see One Continent By Id
+                        case 3:
+                            continentService.addContinent ();
+                            break;//TODO add One new Continent
+                        case 4:
+                            continentService.updateContinent ();
+                            break;//TODO edit One Continent
+                        case 5:
+                            continentService.deleteContinent ();
+                            break;//TODO delete One Continent
                     }
-                    System.out.println("We did a continent thing!");
+                    System.out.println ("We did a continent thing!");
+
+                }else if (choiceOne==3){
+                        switch (choiceTwo) {
+                            case 1:
+                                cityService.showAllCity ();
+                                break;//TODO see All City
+                            case 2:
+                                cityService.showCityById ();
+                                break;//TODO see One City By Id
+                            case 3:
+                                cityService.addCity ();
+                                break;//TODO add One new City
+                            case 4:
+                                cityService.updateCity ();
+                                break;//TODO edit One City
+                            case 5:
+                                cityService.deleteACity ();
+                                break;//TODO delete One City
+                        }
+                        System.out.println("We did a continent thing!");
 
                 }
             choiceOne =9;

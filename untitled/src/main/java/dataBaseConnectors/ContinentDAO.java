@@ -3,47 +3,39 @@ package dataBaseConnectors;
 import model.Continent;
 import model.Country;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Query;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ContinentDAO {
 
-    private Connection connection;
+    private EntityManagerFactory emf;
 
     public ContinentDAO() throws SQLException {
-        connection = ConnectionFactory.getConnection();
+        emf = EMFactory.getEMF ();
     }
 
     //TODO: create update, delete and Insert methods
 
     public Continent getContinentById(int id) throws SQLException {
-        Statement statement = connection.createStatement();
-        String select = "SELECT * FROM Continent WHERE id = "+id+";";
-        ResultSet resultSet = statement.executeQuery(select);
-        Continent continent = null;
-        while (resultSet.next())
-            continent = new Continent(resultSet.getInt("Id"),resultSet.getString("name"));
-        return continent;
+        EntityManager em = emf.createEntityManager ();
+        return em.find (Continent.class,id);
     }
 
 
     public List<Continent> getAllContinents() throws SQLException {
-        Statement statement = connection.createStatement();
-        String select = "SELECT * FROM Continent;";
-        ResultSet resultSet = statement.executeQuery(select);
-        List<Continent> continentList = new ArrayList<> ();
-        while (resultSet.next()){
-            Continent continent =
-                    new Continent(resultSet.getInt("Id"),resultSet.getString("name"));
-            continentList.add(continent);
-        }
+        EntityManager em = emf.createEntityManager ();
+        Query query = em.createQuery ("From Continent", Continent.class);
+        List<Continent> continentList = query.getResultList ();
         return continentList;
     }
 
-    public Continent getContinentByCountry(Country country) throws SQLException {
-        Statement statement = connection.createStatement();
-        String select = "SELECT * FROM Continent WHERE id = "+country.getContinentId()+";";
+    /*public Continent getContinentByCountry(Country country) throws SQLException {
+        Statement statement = emf.createStatement();
+        String select = "SELECT * FROM Continent WHERE id = "+country.getContinent ().getId ()+";";
         ResultSet resultSet = statement.executeQuery(select);
         Continent continent = null;
         while (resultSet.next())
@@ -51,26 +43,27 @@ public class ContinentDAO {
         return continent;
     }
 
+     */
+
     public void addContinent(Continent continent) throws SQLException {
-        PreparedStatement preparedStatement =
-                connection.prepareStatement ("INSERT INTO Continent (name) VALUES (?);");
-        preparedStatement.setString (1, continent.getName ());
-        preparedStatement.execute ();
+        EntityManager em = emf.createEntityManager ();
+        em.getTransaction ().begin ();
+        em.persist (continent);
+        em.getTransaction ().commit ();
     }
 
-    public void updateContinent(Continent continent, int id) throws SQLException {
-        PreparedStatement preparedStatement =
-                connection.prepareStatement ("UPDATE Continent SET id = ?, name = ? WHERE id =?;");
-        preparedStatement.setInt (1, continent.getId ());
-        preparedStatement.setString (2, continent.getName ());
-        preparedStatement.setInt (3, id);
-        preparedStatement.execute ();
+    public void updateContinent(Continent continent) throws SQLException {
+        EntityManager em = emf.createEntityManager ();
+        em.getTransaction ().begin ();
+        em.merge (continent);
+        em.getTransaction ().commit ();
     }
 
     public void deleteContinent(Continent continent) throws SQLException {
-        Statement statement = connection.createStatement ();
-        String delete = "DELETE FROM Continent Where id = "+continent.getId ()+";";
-        statement.executeUpdate (delete);
+        EntityManager em = emf.createEntityManager ();
+        em.getTransaction ().begin ();
+        em.remove (em.find (Continent.class, continent.getId ()));
+        em.getTransaction ().commit ();
     }
 
 }

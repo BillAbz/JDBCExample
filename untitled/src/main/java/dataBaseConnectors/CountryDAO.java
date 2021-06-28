@@ -1,73 +1,63 @@
 package dataBaseConnectors;
 
+import model.Continent;
 import model.Country;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Query;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class CountryDAO {
-    private Connection connection;
+    private EntityManagerFactory emf;
 
     public CountryDAO() throws SQLException {
-        connection = DriverManager.getConnection("jdbc:mysql://moktok.intecbrussel.org:33062/bilalabz",
-                "bilalabz", "bilalabz2021");
+        emf = EMFactory.getEMF ();
     }
 
 
     public Country getCountryById(int id) throws SQLException {
-        Statement statement = connection.createStatement ();
-        String select = "SELECT * FROM Country WHERE id = "+id+";";
-        ResultSet resultSet = statement.executeQuery (select);
-        Country country = null;
-        while (resultSet.next ()){
-            country = new Country (resultSet.getInt ("id"), resultSet.getString ("name"), resultSet.getInt ("continent"));
-        }
-
-        return country;
+        EntityManager em  = emf.createEntityManager ();
+        return em.find (Country.class, id);
     }
 
     public List<Country> getAllCountries() throws SQLException {
-        Statement statement = connection.createStatement();
-        String select = "SELECT * FROM Country;";
-        ResultSet resultSet = statement.executeQuery(select);
-        List<Country> countryList = new ArrayList<Country> ();
-        while (resultSet.next()){
-            Country country = new Country(resultSet.getInt("id"),resultSet.getString("name"),resultSet.getInt("continentId"));
-            countryList.add(country);
-        }
+        EntityManager em = emf.createEntityManager ();
+        Query query = em.createQuery ("From Country", Country.class);
+        List<Country> countryList = query.getResultList ();
         return countryList;
     }
 
     public void addCountry(Country country) throws SQLException {
-        PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO Country (name, continentId) VALUES (?,?);");
-        preparedStatement.setString(1, country.getName());
-        preparedStatement.setInt(2, country.getContinentId());
-        preparedStatement.execute();
+        EntityManager em = emf.createEntityManager ();
+        em.getTransaction ().begin ();
+        em.persist (country);
+        em.getTransaction ().commit ();
     }
 
-    public void updateCountry(Country country, int id) throws SQLException {
+    public void updateCountry(Country country) throws SQLException {
 
-        PreparedStatement preparedStatement = connection.prepareStatement ("UPDATE Country SET name = ?, continentId = ? WHERE id = ?");
-        preparedStatement.setString (1, country.getName ());
-        preparedStatement.setInt (2, country.getContinentId ());
-        preparedStatement.setInt (3, id);
-        preparedStatement.execute ();
+        EntityManager em = emf.createEntityManager ();
+        em.getTransaction ().begin ();
+        em.merge (country);
+        em.getTransaction ().commit ();
 
     }
+    /*
     public void deleteCountryWithId(int id) throws SQLException {
 
-        PreparedStatement preparedStatement = connection.prepareStatement ("DELETE FROM Country WHERE id =?");
+        PreparedStatement preparedStatement = emf.prepareStatement ("DELETE FROM Country WHERE id =?");
         preparedStatement.setInt (1, id);
         preparedStatement.execute ();
-
-
-
     }
+     */
 
     public void deleteCountry(Country country) throws SQLException {
-        Statement statement = connection.createStatement();
-        String delete= "Delete FROM Country WHERE id = "+country.getId()+";";
-        statement.executeUpdate(delete);
+        EntityManager em = emf.createEntityManager ();
+        em.getTransaction ().begin ();
+        em.remove (em.find (Country.class, country.getId ()));
+        em.getTransaction ().commit ();
     }
 }

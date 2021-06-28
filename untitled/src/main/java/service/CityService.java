@@ -1,28 +1,31 @@
 package service;
 
-import model.Continent;
+import dataBaseConnectors.CityDAO;
+import dataBaseConnectors.ContinentDAO;
+import dataBaseConnectors.CountryDAO;
+import model.City;
 import model.Country;
-import dataBaseConnectors.*;
 
 import java.sql.SQLException;
 import java.util.Locale;
 import java.util.Scanner;
 
-public class CountryService {
+public class CityService {
+    private CityDAO cityDAO;
     private CountryDAO countryDAO;
     private ContinentDAO continentDAO;
 
-    public CountryService() throws SQLException {
-        countryDAO = new CountryDAO();
-        continentDAO = new ContinentDAO();
+    public CityService() throws SQLException {
+        cityDAO = new CityDAO ();
+        continentDAO = new ContinentDAO ();
+        countryDAO = new CountryDAO ();
     }
 
-
-    public void showAllCountries() throws SQLException {
-        countryDAO.getAllCountries().forEach(System.out::println);
+    public void showAllCity() throws SQLException {
+        cityDAO.getAllCities ().forEach (System.out::println);
     }
 
-    public void showCountryById() throws SQLException {
+    public void showCityById() throws SQLException {
         Scanner scanner = new Scanner(System.in);
         boolean rightInput;
         int id= 0;
@@ -38,90 +41,90 @@ public class CountryService {
             }
         }while (!rightInput);
 
-        Country country = countryDAO.getCountryById(id);
-        if (country!= null) System.out.println(country);
-        else System.out.println("This Id does not have a country");
+        City city = cityDAO.getCityById (id);
+        if (city!= null) System.out.println(city);
+        else System.out.println("This Id does not have a city");
     }
 
-    public void  addCountry() throws SQLException {
+    public void  addCity() throws SQLException {
         Scanner scanner = new Scanner(System.in);
-        //check which continents there are
-        continentDAO.getAllContinents().forEach(System.out::println);
-        System.out.println("Which one of these continents do you want to use? Type in a number.");
-        //select continent
+        //check which country there are
+        countryDAO.getAllCountries ().forEach (System.out::println);
+        System.out.println("Which one of these country do you want to use? Type in a number.");
+        //select country
         boolean exists = false;
-        int continentId =0;
+        int countryId =0;
         while (!exists) {
-            continentId = makeACorrectId();
-            if (continentDAO.getContinentById(continentId)!=null)
+            countryId = makeACorrectId();
+            if (countryDAO.getCountryById (countryId)!=null)
                 exists = true;
             else System.out.println("This continent doesn't exist.");
         }
-        System.out.println("Insert countryName");
-        String countryName = scanner.next();
-        Country country = new Country(countryName,continentDAO.getContinentById (continentId));
+        System.out.println("Insert cityName");
+        String cityName = scanner.next();
+        City city = new City (cityName, countryDAO.getCountryById (countryId));
         //insert into table
-        countryDAO.addCountry(country);
-        System.out.println("Country was made");
+        cityDAO.addCity (city);
+        System.out.println("City was made");
 
     }
 
-    public void updateCountry() throws SQLException {
-        countryDAO.getAllCountries().forEach(System.out::println);
+    public void updateCity() throws SQLException {
+        cityDAO.getAllCities ().forEach (System.out::println);
         System.out.println("Which one do you want to edit? Select number");
         boolean exist = false;
         int currentId = 0;
         while (!exist){
             currentId = makeACorrectId();
-            if (countryDAO.getCountryById(currentId)!= null) exist = true;
-            else System.out.println("Country doesn't exist");
+            if (cityDAO.getCityById (currentId)!= null) exist = true;
+            else System.out.println("City doesn't exist");
         }
         Scanner scanner = new Scanner(System.in);
-        Country country = countryDAO.getCountryById(currentId);
+        City city = cityDAO.getCityById (currentId);
         System.out.println("Do you want to change the name? NA for nothing");
         String answer = scanner.next();
         if(!answer.toUpperCase(Locale.ROOT).equals("NA")){
             System.out.println("What do you want to change it to?");
             String name = scanner.next();
-            country.setName(name);
+            city.setName(name);
         }
-        System.out.println("Do you want to change the Continent? NA for nothing");
+        System.out.println("Do you want to change the Country? NA for nothing");
         answer = scanner.next();
         if(!answer.toUpperCase(Locale.ROOT).equals("NA")){
             System.out.println("What do you want to change it to?");
             int id = scanner.nextInt();
-            country.setContinent (continentDAO.getContinentById (id));
+            city.setCountry (countryDAO.getCountryById (id));
 
         }
 
-        countryDAO.updateCountry(country);
-        System.out.println("Country updated");
+        cityDAO.updateCity (city);
+        System.out.println("City updated");
 
     }
 
-    public void deleteACountry() throws SQLException {
+    public void deleteACity() throws SQLException {
         Scanner scanner = new Scanner(System.in);
-        countryDAO.getAllCountries().forEach(System.out::println);
-        System.out.println("Give id of country you want to delete:");
-        int countryId = giveExistingCountryId();
-        System.out.println("Are you sure you want to delete this country:");
-        System.out.println(countryDAO.getCountryById(countryId));
+        cityDAO.getAllCities ().forEach (System.out::println);
+        System.out.println("Give id of city you want to delete:");
+        int cityId = giveExistingCityId();
+        System.out.println("Are you sure you want to delete this city:");
+        System.out.println(cityDAO.getCityById (cityId));
         System.out.println("Y/N");
         String answer = scanner.next();
         if (answer.toUpperCase(Locale.ROOT).equals("Y")){
-            countryDAO.deleteCountry(countryDAO.getCountryById(countryId));
-            System.out.println("country has been deleted");
-        }else System.out.println("Country has not been deleted");
+            cityDAO.deleteCity (cityDAO.getCityById (cityId));
+            System.out.println("City has been deleted");
+        }else System.out.println("City has not been deleted");
 
     }
 
-    private int giveExistingCountryId() throws SQLException {
+    private int giveExistingCityId() throws SQLException {
         boolean exist = false;
         int currentId= 0;
         while (!exist){
             currentId = makeACorrectId();
-            if (countryDAO.getCountryById(currentId)!= null) exist = true;
-            else System.out.println("Country doesn't exist");
+            if (cityDAO.getCityById (currentId)!= null) exist = true;
+            else System.out.println("City doesn't exist");
         }
         return currentId;
     }
@@ -148,7 +151,7 @@ public class CountryService {
 
     //Methods without checks
 
-    public void showCountryByIdWithoutCheck() throws SQLException {
+    public void showCityByIdWithoutCheck() throws SQLException {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Give an id of a country");
         int id = scanner.nextInt();
@@ -159,7 +162,7 @@ public class CountryService {
 
     }
 
-    public void  addCountryWithoutCheck() throws SQLException {
+    public void  addCityWithoutCheck() throws SQLException {
         Scanner scanner = new Scanner(System.in);
         continentDAO.getAllContinents().forEach(System.out::println);
         System.out.println("Which one of these continents do you want to use? Type in a number.");
@@ -172,7 +175,7 @@ public class CountryService {
 
     }
 
-    public void updateCountryWithoutCheck() throws SQLException {
+    public void updateCityWithoutCheck() throws SQLException {
         Scanner scanner = new Scanner(System.in);
         countryDAO.getAllCountries().forEach(System.out::println);
         System.out.println("Which one do you want to edit? Select number");
@@ -188,8 +191,7 @@ public class CountryService {
         System.out.println("Change the ContinentID to something new. NA if you don't want to change it.");
         answer = scanner.next();
         if (!answer.toUpperCase(Locale.ROOT).equals("NA")){
-            Continent continent = continentDAO.getContinentById (Integer.parseInt(answer));
-            country.setContinent (continent);
+            country.setContinent (continentDAO.getContinentById (Integer.parseInt(answer)));
         }
 
         countryDAO.updateCountry(country);
@@ -197,6 +199,4 @@ public class CountryService {
 
 
     }
-
-
 }
